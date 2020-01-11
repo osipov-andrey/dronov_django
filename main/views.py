@@ -20,7 +20,6 @@ from .models import AdvUser, SubRubric, Bb
 from .forms import ChangeUserInfoForm, RegisterUserForm, SearchForm
 from .utilities import signer
 
-
 # Create your views here.
 # ----------------------------------------------АВТОРИЗАЦИЯ-------------------------------------------------------#
 class DeleteUserView(LoginRequiredMixin, DeleteView):
@@ -134,6 +133,16 @@ def by_rubric(request, pk):
         'form': form,
     }
     return render(request, 'main/by_rubric.html', context)
+
+
+def detail(request, rubric_pk, pk):
+    bb = get_object_or_404(Bb, pk=pk)
+    ais = bb.additionalimage_set.all()  # Список дополнительных изображений
+    context = {
+        'bb': bb,
+        'ais': ais,
+    }
+    return render(request, 'main/detail.html', context)
 # ----------------------------------------------ОБЪЯВЛЕНИЯ--------------------------------------------------------#
 
 
