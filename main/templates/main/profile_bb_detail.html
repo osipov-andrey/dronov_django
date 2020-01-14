@@ -1,0 +1,48 @@
+{% extends "layout/basic.html" %}
+{% load static %}
+{% block title %}{{ bb.title }} - {{ bb.rubric.name }}: Просмотр и редактирование{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        {% if bb.image %}
+        <div class="col-md-auto"><img src="{{ bb.image.url }}" class="main-image"></div>
+        <!-- main-image - определен в main/style.css -->
+        {% else %}
+        <div class="col-md-auto"><img class="main-image" src="{% static 'main/empty.jpg' %}"></div>
+        {% endif %}
+        <div class="col">
+            <h2>{{ bb.title }}</h2>
+            <p>{{ bb.content }}</p>
+            <p class="font-weight-bold">{{ bb.price }} руб.</p>
+
+            {% if bb.author.first_name %}
+            <p>{{ bb.contacts }} - {{ bb.author.first_name }}</p>
+            {% else %}
+            <p>{{ bb.contacts }} - {{ bb.author }}</p>
+            {% endif %}
+
+            <p class="text-right font-italic">Объявление добавлено {{ bb.created_at }}</p>
+        </div>
+    </div>
+</div>
+
+{% if ais %}
+<div class="d-flex justify-content-between flex-wrap mt-5">
+<!-- d-flex - устанавлиает для элемента гибкую разметку, при которой
+дочерние элементы выстраиваются внутри родителя по горизонтали.
+justify-content-between - указывает, что дочерние элементы (доп. иллюстрации)
+должны располагаться внутри родителя на равном расстоянии.
+flex-wrap - если не хватит места по гоизонтали - перенести элементы на след. строку.
+mt-5 - большой внешний отступ сверху -->
+    {% for ai in ais %}
+    <div>
+        <img class="additional-image" src="{{ ai.image.url }}">
+        <!-- additional-image - определен в main/style.css -->
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk %}{{ all }}"Назад></a></p>
+{% endblock %}

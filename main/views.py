@@ -11,13 +11,13 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.core.signing import BadSignature
 from django.core.paginator import Paginator
 from django.db.models import Q
 
 from .models import AdvUser, SubRubric, Bb
-from .forms import ChangeUserInfoForm, RegisterUserForm, SearchForm
+from .forms import ChangeUserInfoForm, RegisterUserForm, SearchForm, BbForm, AIFormSet
 from .utilities import signer
 
 # Create your views here.
@@ -103,7 +103,20 @@ def user_activate(request, sign):
 
 @login_required
 def profile(request):
-    return render(request, 'main/profile.html')
+    bbs = Bb.objects.filter(author=request.user.pk)
+
+    paginator = Paginator(bbs, 3)
+    if 'page' in request.GET:
+        page_num = request.GET['page']
+    else:
+        page_num = 1
+    page = paginator.get_page(page_num)
+
+    context = {
+        'bbs': page.object_list,
+        'page': page,
+    }
+    return render(request, 'main/profile.html', context)
 # ----------------------------------------------АВТОРИЗАЦИЯ-------------------------------------------------------#
 
 
@@ -143,6 +156,77 @@ def detail(request, rubric_pk, pk):
         'ais': ais,
     }
     return render(request, 'main/detail.html', context)
+
+
+@login_required
+def profile_bb_detail(request, rubric_pk, pk):
+    bb = get_object_or_404(Bb, pk=pk)
+    ais = bb.additionalimage_set.all()  # Список дополнительных изображений
+    context = {
+        'bb': bb,
+        'ais': ais,
+    }
+    return render(request, 'main/profile_bb_detail.html', context)
+
+
+@login_required
+def profile_bb_add(request):
+    if request.method == 'POST':
+        form = BbForm(request.POST, request.FILES)
+        if form.is_valid():
+            bb = form.save()
+            formset = AIFormSet(request.POST, request.FILES, instance=bb)  # все доп.иллюстрации после сохранения
+            # окажутся связанными с объявлением
+            if formset.is_valid():
+                formset.save()
+                messages.add_message(request, messages.SUCCESS, 'Объявление добавлено')
+                return redirect('main:profile')
+    else:
+        form = BbForm(initial={
+            'author': request.user.pk,
+        })
+        formset = AIFormSet()
+        context = {
+            'form': form,
+            'formset': formset,
+        }
+        return render(request, 'main/profile_bb_add.html', context)
+
+
+@login_required
+def profile_bb_change(request, pk):
+    bb = get_object_or_404(Bb, pk=pk)
+    if request.method == 'POST':
+        form = BbForm(request.POST, request.FILES, instance=bb)
+        if form.is_valid():
+            bb = form.save()
+            formset = AIFormSet(request.POST, request.FILES, instance=bb)
+            if formset.is_valid():
+                formset.save()
+                messages.add_message(request, messages.SUCCESS, 'Объявление отредактировано')
+                return redirect('main:profile')
+    else:
+        form = BbForm(instance=bb)
+        formset = AIFormSet(instance=bb)
+    context = {
+        'form': form,
+        'formset': formset,
+    }
+    return render(request, 'main/profile_bb_change.html', context)
+
+
+@login_required
+def profile_bb_delete(request, pk):
+    bb = get_object_or_404(Bb, pk=pk)
+    if request.method == 'POST':
+        bb.delete()
+        messages.add_message(request, messages.SUCCESS, 'Объявление удалено')
+        return redirect('main:profile')
+    else:
+        context = {
+            'bb': bb
+        }
+        return render(request, 'main/profile_bb_delete.html', context)
 # ----------------------------------------------ОБЪЯВЛЕНИЯ--------------------------------------------------------#
 
 
@@ -155,4 +239,8 @@ def other_page(request, page):
 
 
 def index(request):
-    return render(request, 'main/index.html')
+    bbs = Bb.objects.filter(is_active=True)[:10]
+    context = {
+        'bbs': bbs,
+    }
+    return render(request, 'main/index.html', context)

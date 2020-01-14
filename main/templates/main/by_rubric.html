@@ -33,7 +33,7 @@
             {% if bb.image %}
             <img class="mr-3" src="{% thumbnail bb.image 'default' %}">
             {% else %}
-            <img class="empty-image mr-3" src="{% static 'main/empty.jpg' %}">
+            <img class="empty-image mr-3" src="{% static 'main/empty.jpg' %}"> <!-- empty-image - from style.css -->
             {% endif %}
         </a>
         <div class="media-body">
