@@ -1,5 +1,6 @@
 {% extends "layout/basic.html" %}
 {% load static %}
+{% load bootstrap4 %}
 {% block title %}{{ bb.title }} - {{ bb.rubric.name }}: Просмотр и редактирование{% endblock %}
 
 {% block content %}
@@ -45,4 +46,24 @@ mt-5 - большой внешний отступ сверху -->
 {% endif %}
 
 <p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk %}{{ all }}"Назад></a></p>
+
+<p><a href="{% url 'main:by_rubric' pk=bb.rubric.pk %}{{ all }}"Назад></a></p>
+<h4 class="mt-5">Комментарии:</h4>
+{% if comments %}
+<div class="mt-5">
+    {% for comment in comments %}
+    <div class="my-2 p-2 border"> <!--my-2 - небольшие внешние отступы сверху и снизу.
+                                  p-2 - небольшие внутренние отступы со всех сторон -->
+        <h5>{{ comment.author }}</h5>
+        <p>{{ comment.content }}</p>
+        <p class="text-right font-italic">{{ comment.created_at}}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+ <div class="my-2 p-2 border"> <!--my-2 - небольшие внешние отступы сверху и снизу.
+                                  p-2 - небольшие внутренние отступы со всех сторон -->
+        <p>Нет комментариев :(</p>
+    </div>
+{% endif %}
 {% endblock %}

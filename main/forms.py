@@ -2,8 +2,9 @@ from django import forms
 from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory
+from captcha.fields import CaptchaField
 
-from .models import AdvUser, user_registrated, SuperRubric, SubRubric, Bb, AdditionalImage
+from .models import AdvUser, user_registrated, SuperRubric, SubRubric, Bb, AdditionalImage, Comment
 
 
 # ----------------------------------------------АВТОРИЗАЦИЯ-------------------------------------------------------#
@@ -84,3 +85,25 @@ class BbForm(forms.ModelForm):
 
 AIFormSet = inlineformset_factory(Bb, AdditionalImage, fields='__all__')
 # ----------------------------------------------ОБЪЯВЛЕНИЯ--------------------------------------------------------#
+
+
+# ----------------------------------------------КОММЕНТАРИИ-------------------------------------------------------#
+class UserCommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        exclude = ('is_active',)  # Убираем из формы, т.к. это поле только для админки
+        widgets = {
+            'bb': forms.HiddenInput,
+            'author': forms.HiddenInput,
+        }
+
+
+class GuestCommentForm(forms.ModelForm):
+    captcha = CaptchaField(label='Введите текст с картинки',
+                           error_messages={'invalid': 'Неправильный текст'})
+
+    class Meta:
+        model = Comment
+        exclude = ('is_active',)
+        widgets = {'bb': forms.HiddenInput}
+# ----------------------------------------------КОММЕНТАРИИ-------------------------------------------------------#

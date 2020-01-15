@@ -1,0 +1,11 @@
+Уважаемый {{ author }}!
+
+Пользователь {{ comment.author }} оставил к вашему объявлению "{{ bb_title }}" комментарий:
+
+"{{ comment.content }}"
+
+Время добавления: {{ comment.created_at }}
+
+{{ host }}{% url 'main:profile_bb_detail' rubric_pk=comment.bb.rubric.pk pk=comment.bb.pk %}
+
+С уважением, Педики-Медведики!

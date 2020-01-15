@@ -23,6 +23,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('social/', include('social_django.urls', namespace='social')),
     path('admin/', admin.site.urls),
+    path('captcha/', include('captcha.urls')),
     path('', include('main.urls', namespace='')),
 ]
 
