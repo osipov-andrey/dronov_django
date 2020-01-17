@@ -7,7 +7,9 @@
 <div class="container-fluid mt-3">
     <div class="row">
         {% if bb.image %}
-        <div class="col-md-auto"><img src="{{ bb.image.url }}" class="main-image"></div>
+        <a href="{{ bb.image.url }}">
+            <img src="{{ bb.image.url }}" class="main-image">
+        </a>
         <!-- main-image - определен в main/style.css -->
         {% else %}
         <div class="col-md-auto"><img class="main-image" src="{% static 'main/empty.jpg' %}"></div>
@@ -29,7 +31,7 @@
 </div>
 
 {% if ais %}
-<div class="d-flex justify-content-between flex-wrap mt-5">
+<div class="d-flex justify-content-start flex-wrap mt-5">
 <!-- d-flex - устанавлиает для элемента гибкую разметку, при которой
 дочерние элементы выстраиваются внутри родителя по горизонтали.
 justify-content-between - указывает, что дочерние элементы (доп. иллюстрации)
@@ -37,9 +39,11 @@ justify-content-between - указывает, что дочерние элеме
 flex-wrap - если не хватит места по гоизонтали - перенести элементы на след. строку.
 mt-5 - большой внешний отступ сверху -->
     {% for ai in ais %}
-    <div>
-        <img class="additional-image" src="{{ ai.image.url }}">
-        <!-- additional-image - определен в main/style.css -->
+    <div class="mr-2">
+        <a href="{{ ai.image.url }}">
+            <img class="additional-image" src="{{ ai.image.url }}">
+            <!-- additional-image - определен в main/style.css -->
+        </a>
     </div>
     {% endfor %}
 </div>
@@ -57,6 +61,14 @@ mt-5 - большой внешний отступ сверху -->
         <h5>{{ comment.author }}</h5>
         <p>{{ comment.content }}</p>
         <p class="text-right font-italic">{{ comment.created_at}}</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {{form.as_table}}
+            <input type="hidden" name="comment" value="{{ comment.pk }}">
+            <input type="submit" value="Удалить">
+        </form>
+
     </div>
     {% endfor %}
 </div>

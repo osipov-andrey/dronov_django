@@ -94,6 +94,13 @@ class Bb(models.Model):  # Объявление
     is_active = models.BooleanField(default=True, db_index=True, verbose_name='Выводить в списке?')
     created_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Опубликовано')
 
+    def comments(self):
+        self.comments = self.comment_set.all()
+        n = len(self.comments)
+        return f'Всего {n} комментари' + ('ев' if n%10==0 or 4<n%10<10 or 10<n%100<15 else 'я' if 1<n%10<5 else 'й')
+
+    comments.short_description = 'Комментарии'
+
     def delete(self, *args, **kwargs):
         for ai in self.additionalimage_set.all():  # модель дополнительных иллюстраций
             ai.delete()  # при вызове delete() возникает сигнал post_delete, обрабатываемый приложением django_cleanup,

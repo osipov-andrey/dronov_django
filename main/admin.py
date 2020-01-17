@@ -2,7 +2,7 @@ from django.contrib import admin
 import datetime
 
 # Register your models here.
-from .models import AdvUser, SuperRubric, SubRubric, Bb, AdditionalImage
+from .models import AdvUser, SuperRubric, SubRubric, Bb, AdditionalImage, Comment
 from .utilities import send_activation_notification
 from .forms import SubRubricForm
 
@@ -84,10 +84,15 @@ class AdditionalImageInLine(admin.TabularInline):  # Встроенный ред
     model = AdditionalImage
 
 
+class CommentInLine(admin.TabularInline):
+    model = Comment
+
+
 class BbAdmin(admin.ModelAdmin):
-    list_display = ('rubric', 'title', 'content', 'author', 'created_at')
+    list_display = ('rubric', 'title', 'content', 'author', 'created_at', 'comments')
+    list_display_links = ('title', 'content')
     fields = (('rubric', 'author'), 'title', 'content', 'price', 'contacts', 'image', 'is_active')
-    inlines = (AdditionalImageInLine,)
+    inlines = (AdditionalImageInLine, CommentInLine)
 
 
 admin.site.register(Bb, BbAdmin)

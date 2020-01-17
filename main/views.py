@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.contrib import messages
@@ -151,6 +151,7 @@ def by_rubric(request, pk):
 
 
 def detail(request, rubric_pk, pk):
+
     bb = get_object_or_404(Bb, pk=pk)
     ais = bb.additionalimage_set.all()  # Список дополнительных изображений
     comments = Comment.objects.filter(bb=pk, is_active=True)
@@ -161,14 +162,23 @@ def detail(request, rubric_pk, pk):
     else:
         form_class = GuestCommentForm
     form = form_class(initial=initial)
+
     if request.method == 'POST':
-        c_form = form_class(request.POST)
-        if c_form.is_valid():
-            c_form.save()
-            messages.add_message(request, messages.SUCCESS, 'Комментарий добавлен')
+        if request.user.is_superuser and request.POST.get('comment_delete', None):
+            comment_pk = request.POST.get('comment_delete', None)
+            comment = Comment.objects.get(pk=comment_pk)
+            comment.delete()
+            messages.add_message(request, messages.SUCCESS, 'Комментарий удален')
+            return HttpResponseRedirect(f'/{rubric_pk}/{pk}')
         else:
-            form = c_form
-            messages.add_message(request, messages.WARNING, 'Комментарий не добавлен')
+            c_form = form_class(request.POST)
+            if c_form.is_valid():
+                c_form.save()
+                messages.add_message(request, messages.SUCCESS, 'Комментарий добавлен')
+                return HttpResponseRedirect(f'/{rubric_pk}/{pk}')
+            else:
+                form = c_form
+                messages.add_message(request, messages.WARNING, 'Комментарий не добавлен')
     context = {
         'bb': bb,
         'ais': ais,
@@ -181,6 +191,13 @@ def detail(request, rubric_pk, pk):
 @login_required
 def profile_bb_detail(request, rubric_pk, pk):
     bb = get_object_or_404(Bb, pk=pk)
+
+    if request.method == 'POST':
+        comment_pk = request.POST.get('comment', None)
+        comment = Comment.objects.get(pk=comment_pk)
+        comment.delete()
+        messages.add_message(request, messages.SUCCESS, 'Комментарий удален')
+
     ais = bb.additionalimage_set.all()  # Список дополнительных изображений
     comments = Comment.objects.filter(bb=pk, is_active=True)
     context = {
