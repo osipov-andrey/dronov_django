@@ -8,4 +8,4 @@
 
 {{ host }}{% url 'main:profile_bb_detail' rubric_pk=comment.bb.rubric.pk pk=comment.bb.pk %}
 
-С уважением, Педики-Медведики!
+С уважением, администрация сайта!

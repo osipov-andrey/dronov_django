@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django_cleanup',
     'easy_thumbnails',
     'captcha',
+    'rest_framework',
+    'corsheaders',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'bboard.urls'
@@ -163,3 +167,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST_USER = 'osyapov@bk.ru'
 # EMAIL_HOST_PASSWORD = 'MZeda4a8J6d'
 # DEFAULT_FROM_EMAIL = 'admin@bboard.ru'
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URL_REGEX = r'^/api/.*$'  # разрешаем доступ к веб-службе с любого домена

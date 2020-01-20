@@ -24,10 +24,11 @@ urlpatterns = [
     path('social/', include('social_django.urls', namespace='social')),
     path('admin/', admin.site.urls),
     path('captcha/', include('captcha.urls')),
+    path('api/', include('api.urls')),
     path('', include('main.urls', namespace='')),
 ]
 
 if settings.DEBUG:
-    urlpatterns.append(path('static/<path:path>', never_cache(serve)))  # запрет на кэширвоание стилей, пока с ними
+    urlpatterns.append(path('static/<path:path>', never_cache(serve)))  # запрет на кэширование стилей, пока с ними
     # не закончили
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

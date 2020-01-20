@@ -1,0 +1,16 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta hhtp-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <script type="text/javascript" src="/static/scripts/rubrics.js"></script>
+    <title>Список рубрик</title>
+</head>
+<body>
+    {% for rubric in rubrics %}
+    <p>{{ rubric }}</p>
+    {% endfor %}
+<div id="list"></div>
+</body>
+</html>
